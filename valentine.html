@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine? 💖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; font-family: Georgia, serif; }
+
+  #page1 {
+    width: 100vw; height: 100vh;
+    background: radial-gradient(ellipse at center, #3d0030 0%, #1a0010 60%, #0a0008 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden; cursor: none;
+  }
+  #page2 {
+    width: 100vw; height: 100vh;
+    background: radial-gradient(ellipse at center, #2a0045 0%, #0d001a 60%, #050008 100%);
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+
+  #cursor {
+    position: fixed; pointer-events: none; z-index: 9999;
+    font-size: 28px; transform: translate(-50%, -50%);
+    filter: drop-shadow(0 0 8px #ff69b4);
+  }
+
+  .floating-heart {
+    position: absolute; pointer-events: none;
+    animation: floatAround linear infinite;
+    opacity: 0.3; user-select: none;
+  }
+  @keyframes floatAround {
+    0%   { transform: translateY(0px) rotate(0deg) scale(1); }
+    25%  { transform: translateY(-30px) rotate(15deg) scale(1.05); }
+    50%  { transform: translateY(-10px) rotate(-10deg) scale(0.95); }
+    75%  { transform: translateY(-40px) rotate(20deg) scale(1.1); }
+    100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  }
+  @keyframes popHeart {
+    0%   { transform: scale(0) translateY(0); opacity: 1; }
+    60%  { transform: scale(1.4) translateY(-80px); opacity: 0.8; }
+    100% { transform: scale(0.5) translateY(-160px); opacity: 0; }
+  }
+  .pop-heart {
+    position: absolute; pointer-events: none;
+    animation: popHeart 1.8s ease-out forwards; font-size: 22px; z-index: 10;
+  }
+
+  h1.title {
+    font-size: clamp(1.8rem, 5vw, 3rem); color: #ffb6c1;
+    text-shadow: 0 0 20px #ff1493, 0 0 50px #ff69b4;
+    text-align: center; margin-bottom: 50px; letter-spacing: 2px;
+    animation: glow 2s ease-in-out infinite alternate;
+    z-index: 5; position: relative;
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 20px #ff1493, 0 0 40px #ff69b4; }
+    to   { text-shadow: 0 0 35px #ff69b4, 0 0 70px #ff1493, 0 0 100px #ffb6c1; }
+  }
+
+  .btn-row { display: flex; gap: 30px; z-index: 5; position: relative; }
+  .btn {
+    padding: 14px 44px; border: none; border-radius: 50px;
+    font-size: 1.3rem; font-family: Georgia, serif; font-weight: bold; cursor: pointer;
+  }
+  #btn-yes {
+    background: linear-gradient(135deg, #ff1493, #ff69b4);
+    color: white; box-shadow: 0 0 20px #ff1493;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  #btn-yes:hover { transform: scale(1.08); box-shadow: 0 0 30px #ff69b4; }
+  #btn-no {
+    background: linear-gradient(135deg, #555, #888);
+    color: white; box-shadow: 0 0 10px #333;
+    position: fixed; transition: none;
+  }
+
+  h2.ty-title {
+    font-size: clamp(1.5rem, 4vw, 2.5rem); color: #e8b4ff;
+    text-shadow: 0 0 20px #cc44ff, 0 0 40px #9900cc;
+    text-align: center; margin-bottom: 10px;
+    z-index: 5; position: relative;
+    animation: glow2 2s ease-in-out infinite alternate;
+  }
+  @keyframes glow2 {
+    from { text-shadow: 0 0 20px #cc44ff; }
+    to   { text-shadow: 0 0 40px #ee88ff, 0 0 80px #cc44ff; }
+  }
+
+  .couple-scene { position: relative; z-index: 5; margin: 20px 0; }
+  .couple-svg { opacity: 0.88; filter: drop-shadow(0 0 18px #cc44ff); }
+
+  .popper {
+    position: absolute; font-size: 40px;
+    animation: popperPop 0.7s ease-out forwards; z-index: 10; pointer-events: none;
+  }
+  @keyframes popperPop {
+    0%   { transform: scale(0) rotate(0deg); opacity: 1; }
+    60%  { transform: scale(1.4) rotate(30deg); opacity: 1; }
+    100% { transform: scale(1) rotate(20deg); opacity: 0.9; }
+  }
+
+  .fall-heart {
+    position: absolute; top: -60px; pointer-events: none;
+    animation: fallDown linear forwards; z-index: 6;
+  }
+  @keyframes fallDown {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    60%  { opacity: 0.9; }
+    100% { transform: translateY(65vh) rotate(360deg); opacity: 0; }
+  }
+
+  .ring-anim {
+    animation: ringSlide 2.5s ease-in-out 0.5s forwards;
+    transform-origin: center; opacity: 0;
+  }
+  @keyframes ringSlide {
+    0%   { transform: translateX(-30px) scale(0.5); opacity: 0; }
+    60%  { transform: translateX(3px) scale(1.1); opacity: 1; }
+    100% { transform: translateX(0) scale(1); opacity: 1; }
+  }
+
+  #sound-btn {
+    position: fixed; top: 14px; right: 14px; z-index: 9999;
+    background: rgba(255,20,147,0.2); border: 1.5px solid #ff69b4;
+    color: #ffb6c1; border-radius: 50px; padding: 8px 18px;
+    font-size: 0.9rem; cursor: pointer; backdrop-filter: blur(4px);
+    transition: background 0.2s;
+  }
+  #sound-btn:hover { background: rgba(255,20,147,0.4); }
+
+  #now-playing {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 9999; color: rgba(255,182,193,0.7); font-size: 0.78rem;
+    letter-spacing: 1px; text-align: center; pointer-events: none;
+    animation: fadeInUp 1s ease 1.5s both;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  #start-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(10,0,20,0.93);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+  }
+  #start-overlay p { color: #ffb6c1; font-size: 1.2rem; text-align: center; line-height: 1.6; }
+  #start-overlay button {
+    padding: 14px 48px; border-radius: 50px; border: none;
+    background: linear-gradient(135deg, #ff1493, #ff69b4);
+    color: white; font-size: 1.2rem; font-family: Georgia, serif;
+    cursor: pointer; box-shadow: 0 0 24px #ff1493;
+  }
+  #start-overlay button:hover { transform: scale(1.04); }
+</style>
+</head>
+<body>
+
+<div id="start-overlay">
+  <p style="font-size:2.5rem">💖</p>
+  <p>Click to begin your<br>Valentine experience</p>
+  <button onclick="startExperience()">Open my heart ♥</button>
+</div>
+
+<div id="cursor">💘</div>
+<button id="sound-btn" onclick="toggleSound()">🔊 Music on</button>
+<div id="now-playing">♪ Romantic Melody — for you, always ♪</div>
+
+<!-- PAGE 1 -->
+<div id="page1">
+  <div id="hearts-container"></div>
+  <h1 class="title">Will you be my Valentine? 💖</h1>
+  <div class="btn-row">
+    <button class="btn" id="btn-yes" onclick="goToPage2()">Yes 💕</button>
+    <button class="btn" id="btn-no">No 🙈</button>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2">
+  <div id="fall-container"></div>
+  <h2 class="ty-title">Thank you for accepting my proposal! 😘</h2>
+  <p style="color:#ffb6c1;font-size:1.1rem;margin-bottom:18px;z-index:5;position:relative;text-align:center;">
+    You've made me the happiest person alive 💜
+  </p>
+  <div class="couple-scene">
+    <svg class="couple-svg" width="280" height="220" viewBox="0 0 280 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="90" cy="60" rx="28" ry="30" fill="#ffe0b2" opacity="0.9"/>
+      <ellipse cx="90" cy="55" rx="20" ry="20" fill="#ffe0b2"/>
+      <ellipse cx="90" cy="37" rx="20" ry="12" fill="#4a2800"/>
+      <rect x="62" y="105" width="56" height="70" rx="12" fill="#1a1a2e" opacity="0.9"/>
+      <polygon points="82,112 90,118 98,112 90,106" fill="#ff1493" opacity="0.85"/>
+      <line x1="118" y1="118" x2="155" y2="130" stroke="#ffe0b2" stroke-width="10" stroke-linecap="round"/>
+      <g class="ring-anim">
+        <circle cx="158" cy="132" r="7" stroke="#ffd700" stroke-width="2.5" fill="none"/>
+        <circle cx="158" cy="126" r="3" fill="#00cfff" opacity="0.9"/>
+      </g>
+      <ellipse cx="195" cy="60" rx="28" ry="30" fill="#ffe0b2" opacity="0.9"/>
+      <ellipse cx="195" cy="55" rx="20" ry="20" fill="#ffe0b2"/>
+      <ellipse cx="195" cy="38" rx="22" ry="14" fill="#5c2d00"/>
+      <path d="M175 38 Q195 10 215 38 Q215 65 195 70 Q175 65 175 38Z" fill="white" opacity="0.55"/>
+      <path d="M167 105 Q195 100 223 105 L230 175 Q195 185 160 175 Z" fill="white" opacity="0.82"/>
+      <ellipse cx="225" cy="130" rx="14" ry="12" fill="#ff69b4" opacity="0.8"/>
+      <text x="219" y="135" font-size="16" fill="white">🌸</text>
+      <line x1="167" y1="120" x2="155" y2="132" stroke="#ffe0b2" stroke-width="10" stroke-linecap="round"/>
+      <text x="130" y="80" font-size="20" fill="#ff69b4" opacity="0.8">❤️</text>
+    </svg>
+  </div>
+  <div id="poppers-container"></div>
+</div>
+
+<script>
+const heartColors = ['❤️','🧡','💛','💚','💙','💜','🩷','🤍','💗','💖','💝','💞'];
+let audioCtx = null;
+let soundOn = true;
+let musicState = null; // holds all active music nodes
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+/* ─────────────────────────────────────────────
+   ROMANTIC MELODY ENGINE
+   • Melody  — main singing voice (sine)
+   • Harmony — third above (triangle, softer)
+   • Bass    — root notes (sine, low)
+   • Pad     — slow sustain chords (sawtooth filtered)
+   • Reverb  — convolver for hall feel
+───────────────────────────────────────────── */
+
+// "Canon in D" inspired romantic progression in D major
+// D  A  Bm F#m G  D  G  A
+const CHORD_ROOTS = [293.66, 220.00, 246.94, 185.00, 196.00, 293.66, 196.00, 220.00];
+const CHORD_THIRDS= [369.99, 277.18, 293.66, 233.08, 246.94, 369.99, 246.94, 277.18];
+const CHORD_FIFTHS= [440.00, 329.63, 369.99, 277.18, 293.66, 440.00, 293.66, 329.63];
+
+// Romantic melody (soprano) — arpeggio / singable line over Canon
+const MELODY = [
+  // bar 1 - D major feel
+  {f:587.33,d:0.5},{f:659.25,d:0.25},{f:587.33,d:0.25},
+  {f:523.25,d:0.5},{f:493.88,d:0.5},
+  // bar 2 - A
+  {f:440.00,d:0.5},{f:493.88,d:0.25},{f:440.00,d:0.25},
+  {f:392.00,d:0.5},{f:369.99,d:0.5},
+  // bar 3 - Bm
+  {f:493.88,d:0.5},{f:523.25,d:0.25},{f:493.88,d:0.25},
+  {f:440.00,d:0.5},{f:415.30,d:0.5},
+  // bar 4 - F#m
+  {f:369.99,d:0.5},{f:415.30,d:0.25},{f:369.99,d:0.25},
+  {f:329.63,d:0.5},{f:293.66,d:0.5},
+  // bar 5 - G
+  {f:392.00,d:0.5},{f:440.00,d:0.25},{f:392.00,d:0.25},
+  {f:349.23,d:0.5},{f:329.63,d:0.5},
+  // bar 6 - D
+  {f:587.33,d:0.5},{f:659.25,d:0.25},{f:587.33,d:0.25},
+  {f:523.25,d:0.5},{f:493.88,d:0.5},
+  // bar 7 - G rise
+  {f:523.25,d:0.5},{f:587.33,d:0.25},{f:659.25,d:0.25},
+  {f:698.46,d:0.5},{f:659.25,d:0.5},
+  // bar 8 - A resolve
+  {f:587.33,d:0.5},{f:523.25,d:0.25},{f:493.88,d:0.25},
+  {f:440.00,d:0.75},{f:392.00,d:0.25},
+];
+
+function buildReverb(ctx) {
+  const convolver = ctx.createConvolver();
+  const len = ctx.sampleRate * 2.5;
+  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
+    }
+  }
+  convolver.buffer = buf;
+  return convolver;
+}
+
+function startRomanticMusic() {
+  if (musicState) return;
+  const ctx = getCtx();
+
+  // Master output chain
+  const master = ctx.createGain();
+  master.gain.value = 0.0;
+  master.gain.linearRampToValueAtTime(0.85, ctx.currentTime + 3); // fade in gently
+  master.connect(ctx.destination);
+
+  // Reverb send
+  const reverb = buildReverb(ctx);
+  const reverbGain = ctx.createGain();
+  reverbGain.gain.value = 0.28;
+  reverb.connect(reverbGain);
+  reverbGain.connect(master);
+
+  // Vibrato LFO for melody expressiveness
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.frequency.value = 5.2;
+  lfoGain.gain.value = 4;
+  lfo.connect(lfoGain);
+  lfo.start();
+
+  musicState = { master, reverb, reverbGain, lfo, looping: true };
+
+  const BEAT = 0.48; // slightly romantic andante tempo
+
+  function scheduleNote(freq, startTime, duration, type, vol, vibrato) {
+    if (!musicState || !musicState.looping) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    if (vibrato) lfoGain.connect(osc.frequency);
+    const attack = Math.min(0.06, duration * 0.12);
+    const release = Math.min(0.18, duration * 0.35);
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(vol, startTime + attack);
+    gain.gain.setValueAtTime(vol, startTime + duration - release);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    osc.connect(gain);
+    gain.connect(master);
+    gain.connect(reverb);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.01);
+  }
+
+  function scheduleChordBass(chordIdx, startTime, duration) {
+    // Bass root — low octave
+    scheduleNote(CHORD_ROOTS[chordIdx] / 2, startTime, duration, 'sine', 0.22, false);
+    // Pad chord — 3 voices, filtered sawtooth feel via triangle
+    scheduleNote(CHORD_ROOTS[chordIdx], startTime, duration, 'triangle', 0.07, false);
+    scheduleNote(CHORD_THIRDS[chordIdx], startTime, duration, 'triangle', 0.06, false);
+    scheduleNote(CHORD_FIFTHS[chordIdx], startTime, duration, 'triangle', 0.05, false);
+  }
+
+  function playLoop() {
+    if (!musicState || !musicState.looping || !soundOn) return;
+
+    let t = ctx.currentTime + 0.05;
+    const barDur = BEAT * 8; // 8 beats per bar
+
+    // Schedule pads & bass for all 8 bars
+    CHORD_ROOTS.forEach((_, i) => {
+      scheduleChordBass(i, t + i * barDur, barDur - 0.05);
+    });
+
+    // Schedule melody (main voice — sine with vibrato)
+    let mt = t;
+    MELODY.forEach(({ f, d }) => {
+      const dur = d * BEAT * 2; // melody is in half-beat units
+      scheduleNote(f, mt, dur, 'sine', 0.38, true);
+      // Harmony a minor third below for richness
+      scheduleNote(f * 0.841, mt, dur, 'triangle', 0.08, false);
+      mt += dur;
+    });
+
+    // Add gentle pizzicato arpeggios on top for sparkle
+    const arpNotes = [
+      587.33, 740.00, 880.00, 740.00,
+      523.25, 659.25, 783.99, 659.25,
+      493.88, 622.25, 739.99, 622.25,
+      440.00, 554.37, 659.25, 554.37,
+      392.00, 493.88, 587.33, 493.88,
+      587.33, 740.00, 880.00, 740.00,
+      523.25, 659.25, 880.00, 1046.50,
+      440.00, 554.37, 659.25, 880.00,
+    ];
+    let at = t;
+    const arpBeat = BEAT * 2;
+    arpNotes.forEach(freq => {
+      scheduleNote(freq, at, arpBeat * 0.7, 'sine', 0.05, false);
+      at += arpBeat;
+    });
+
+    const totalDur = CHORD_ROOTS.length * barDur;
+    setTimeout(playLoop, (totalDur * 1000) - 200);
+  }
+
+  playLoop();
+}
+
+function stopMusic() {
+  if (!musicState) return;
+  try {
+    musicState.master.gain.setTargetAtTime(0, getCtx().currentTime, 0.5);
+    musicState.lfo.stop(getCtx().currentTime + 1);
+  } catch(e) {}
+  musicState.looping = false;
+  setTimeout(() => { musicState = null; }, 1500);
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const btn = document.getElementById('sound-btn');
+  if (soundOn) {
+    btn.textContent = '🔊 Music on';
+    startRomanticMusic();
+  } else {
+    btn.textContent = '🔇 Music off';
+    stopMusic();
+  }
+}
+
+function startExperience() {
+  document.getElementById('start-overlay').style.display = 'none';
+  getCtx();
+  startRomanticMusic();
+  initPage1();
+}
+
+function initPage1() {
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+
+  const container = document.getElementById('hearts-container');
+  for (let i = 0; i < 28; i++) {
+    const el = document.createElement('div');
+    el.className = 'floating-heart';
+    el.style.fontSize = (Math.random() * 36 + 16) + 'px';
+    el.style.left = (Math.random() * 95) + 'vw';
+    el.style.top  = (Math.random() * 90) + 'vh';
+    el.style.animationDuration = (Math.random() * 6 + 4) + 's';
+    el.style.animationDelay = (Math.random() * 4) + 's';
+    el.textContent = heartColors[Math.floor(Math.random() * heartColors.length)];
+    container.appendChild(el);
+  }
+
+  document.getElementById('page1').addEventListener('click', e => {
+    popHeartsAt(e.clientX, e.clientY);
+  });
+
+  const noBtn = document.getElementById('btn-no');
+  noBtn.addEventListener('mouseenter', moveNo);
+  noBtn.style.left = (window.innerWidth * 0.6) + 'px';
+  noBtn.style.top  = (window.innerHeight * 0.55) + 'px';
+
+  function moveNo() {
+    const pw = window.innerWidth, ph = window.innerHeight;
+    const bw = noBtn.offsetWidth, bh = noBtn.offsetHeight;
+    const margin = 40;
+    noBtn.style.left = (Math.random() * (pw - bw - margin * 2) + margin) + 'px';
+    noBtn.style.top  = (Math.random() * (ph - bh - margin * 2) + margin) + 'px';
+  }
+}
+
+function popHeartsAt(x, y) {
+  for (let i = 0; i < 5; i++) {
+    const el = document.createElement('div');
+    el.className = 'pop-heart';
+    el.style.left = (x + (Math.random() - 0.5) * 60) + 'px';
+    el.style.top  = y + 'px';
+    el.style.fontSize = (Math.random() * 14 + 14) + 'px';
+    el.style.animationDuration = (Math.random() * 0.8 + 1.2) + 's';
+    el.textContent = heartColors[Math.floor(Math.random() * heartColors.length)];
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2200);
+  }
+}
+
+function goToPage2() {
+  document.getElementById('page1').style.display = 'none';
+  const p2 = document.getElementById('page2');
+  p2.style.display = 'flex';
+  // Music keeps playing seamlessly — same melody continues
+  startPage2();
+}
+
+function startPage2() {
+  launchPoppers();
+  startFallingHearts();
+}
+
+function launchPoppers() {
+  const corners = [
+    {top:'5%', left:'2%'}, {top:'5%', right:'2%'},
+    {bottom:'5%', left:'2%'}, {bottom:'5%', right:'2%'}
+  ];
+  const emojis = ['🎉','🎊','✨','🎆'];
+  const c = document.getElementById('poppers-container');
+  corners.forEach((pos, i) => {
+    function pop() {
+      const el = document.createElement('div');
+      el.className = 'popper';
+      Object.assign(el.style, pos);
+      el.textContent = emojis[i];
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
+    pop();
+    setInterval(pop, 2500 + i * 400);
+  });
+}
+
+function startFallingHearts() {
+  const fallC = document.getElementById('fall-container');
+  setInterval(() => {
+    const el = document.createElement('div');
+    el.className = 'fall-heart';
+    el.style.left = (Math.random() * 95) + 'vw';
+    el.style.fontSize = (Math.random() * 20 + 14) + 'px';
+    el.style.animationDuration = (Math.random() * 3 + 3) + 's';
+    el.textContent = heartColors[Math.floor(Math.random() * heartColors.length)];
+    fallC.appendChild(el);
+    setTimeout(() => el.remove(), 7000);
+  }, 300);
+}
+</script>
+</body>
+</html>
